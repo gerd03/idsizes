@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>ID Photo Studio - Print Template Master</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪪</text></svg>">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Centered 3D Interactive Header (Zero AI Slop) -->
+    <header class="app-header">
+      <div class="header-3d-card-wrapper" id="header3dCard">
+        <div class="header-3d-card">
+          <div class="header-3d-glare"></div>
+          <svg class="header-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="3" ry="3"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+        </div>
+        <h1 class="brand-title">
+          <span>ID Photo</span><span class="title-word-accent">Studio</span>
+        </h1>
+        <div class="brand-subtitle">
+          <span>Auto-Grid Print Master</span>
+          <span class="brand-badge-pill">A4 &amp; Legal</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- STEP 1: Upload & Adjust -->
+    <section class="ui-card">
+      <div class="card-title">
+        <div class="card-title-left">
+          <span class="step-num">1</span>
+          <span>Your Photo</span>
+        </div>
+        <button class="icon-btn" id="changePhotoBtn" style="display: none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><path d="m21 3-9 9"/><path d="M15 3h6v6"/></svg>
+          Change
+        </button>
+      </div>
+
+      <!-- Upload Dropzone -->
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div class="dropzone-title">Upload / Snap Photo</div>
+        <div class="dropzone-desc">Tap to choose camera or gallery (JPG, PNG, WEBP)</div>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+      </div>
+
+      <!-- Interactive Canvas Crop Editor -->
+      <div class="editor-container" id="editorContainer">
+        <div class="canvas-wrapper" id="canvasWrapper">
+          <canvas id="cropCanvas"></canvas>
+          <svg class="crop-overlay-guide" id="cropOverlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <!-- Semi-transparent darkened mask around guide frame -->
+            <path id="cropMaskPath" fill="rgba(8, 9, 13, 0.72)" fill-rule="evenodd"/>
+            <!-- Frame guide border -->
+            <rect id="cropFrameRect" fill="none" stroke="#4f6ef7" stroke-width="0.8" stroke-dasharray="2 1"/>
+            <!-- Center Crosshair & Oval Biometric Guide (toggleable) -->
+            <ellipse id="biometricOval" cx="50" cy="46" rx="20" ry="26" fill="none" stroke="rgba(255, 255, 255, 0.35)" stroke-width="0.6" stroke-dasharray="1.5 1"/>
+            <line id="guideCrossH" x1="48" y1="46" x2="52" y2="46" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"/>
+            <line id="guideCrossV" x1="50" y1="44" x2="50" y2="48" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"/>
+          </svg>
+        </div>
+
+        <!-- Meticulous Touch Controls -->
+        <div class="editor-controls">
+          <!-- Zoom Slider Row -->
+          <div class="zoom-control-row">
+            <button class="zoom-step-btn" id="zoomOutBtn" title="Zoom Out">−</button>
+            <div class="slider-wrapper">
+              <input type="range" id="zoomSlider" class="zoom-slider" min="1" max="3" step="0.01" value="1">
+            </div>
+            <button class="zoom-step-btn" id="zoomInBtn" title="Zoom In">+</button>
+            <span class="zoom-pct-badge" id="zoomPctBadge">100%</span>
+          </div>
+
+          <!-- Action Buttons Row -->
+          <div class="editor-action-row">
+            <button class="tool-btn" id="rotateBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Rotate 90°</span>
+            </button>
+            <button class="tool-btn" id="resetCropBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              <span>Reset</span>
+            </button>
+            <button class="tool-btn active" id="toggleGuideBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+              <span>Face Guide</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Aspect Ratio Selection -->
+        <div class="crop-ratio-tabs">
+          <div class="ratio-pill active" data-ratio="passport">Passport (35:45)</div>
+          <div class="ratio-pill" data-ratio="square">Square (1:1 / 2x2)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2: Paper & Grid Configuration -->
+    <section class="ui-card">
+      <div class="card-title">
+        <div class="card-title-left">
+          <span class="step-num">2</span>
+          <span>Paper & Layout</span>
+        </div>
+      </div>
+
+      <!-- Paper Size Toggle -->
+      <div class="pill-group" id="paperGroup">
+        <div class="pill-option active" data-paper="a4">A4 (210 × 297 mm)</div>
+        <div class="pill-option" data-paper="legal">Legal (8.5 × 14 in)</div>
+      </div>
+
+      <!-- Meticulous Non-Overlapping Template Grid -->
+      <div class="template-grid" id="templateGrid">
+        <div class="template-card active" data-template="passport">
+          <div class="template-card-top">
+            <span class="template-title">Passport</span>
+            <span class="template-dim">35 × 45 mm</span>
+          </div>
+          <div class="template-card-bottom">
+            <span class="capacity-pill" id="capPassport">30 photos</span>
+          </div>
+        </div>
+
+        <div class="template-card" data-template="2x2">
+          <div class="template-card-top">
+            <span class="template-title">2 × 2 Inch</span>
+            <span class="template-dim">50.8 × 50.8 mm</span>
+          </div>
+          <div class="template-card-bottom">
+            <span class="capacity-pill" id="cap2x2">15 photos</span>
+          </div>
+        </div>
+
+        <div class="template-card" data-template="1x1">
+          <div class="template-card-top">
+            <span class="template-title">1 × 1 Inch</span>
+            <span class="template-dim">25.4 × 25.4 mm</span>
+          </div>
+          <div class="template-card-bottom">
+            <span class="capacity-pill" id="cap1x1">70 photos</span>
+          </div>
+        </div>
+
+        <div class="template-card" data-template="combo">
+          <div class="template-card-top">
+            <span class="template-title">Combo Pack</span>
+            <span class="template-dim">2x2 • Pass • 1x1</span>
+          </div>
+          <div class="template-card-bottom">
+            <span class="capacity-pill" id="capCombo">26 photos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cutting Guide Style Selector -->
+      <div class="guide-style-group" id="guideGroup">
+        <div class="guide-pill active" data-guide="both">Lines & Marks</div>
+        <div class="guide-pill" data-guide="lines">Full Lines</div>
+        <div class="guide-pill" data-guide="marks">Corner Marks</div>
+      </div>
+    </section>
+
+    <!-- STEP 3: Live Sheet Preview -->
+    <section class="ui-card">
+      <div class="card-title">
+        <div class="card-title-left">
+          <span class="step-num">3</span>
+          <span>Sheet Preview</span>
+        </div>
+        <span class="status-badge" id="previewSheetCap" style="background: var(--bg-inset); color: var(--text-secondary); border: 1px solid var(--border-subtle); font-size: 0.72rem; padding: 3px 8px; border-radius: var(--radius-pill);">30 Photos</span>
+      </div>
+
+      <div class="sheet-preview-container">
+        <canvas id="sheetPreviewCanvas"></canvas>
+      </div>
+
+      <div class="preview-legend">
+        <div class="legend-item">
+          <span class="legend-box legend-safe"></span>
+          <span>Safe Margins (&gt;13mm)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-box legend-cut"></span>
+          <span>Exact Cutting Guide</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Collapsible Tips Drawer -->
+    <div class="tips-drawer" id="tipsDrawer">
+      <div class="tips-header" id="tipsHeader">
+        <h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          Print & Cutting Guidelines
+        </h3>
+        <span class="tips-chevron">▼</span>
+      </div>
+      <div class="tips-body">
+        <div class="tip-item">
+          <span class="tip-bullet">•</span>
+          <span><strong>Actual Size (100%):</strong> In your print dialog, always select "Actual Size" or "100%". Never select "Fit to Page" as that distorts official sizes.</span>
+        </div>
+        <div class="tip-item">
+          <span class="tip-bullet">•</span>
+          <span><strong>Paper Type:</strong> Choose "Glossy Photo Paper" in printer settings and set quality to "High" or "Best".</span>
+        </div>
+        <div class="tip-item">
+          <span class="tip-bullet">•</span>
+          <span><strong>Easy Cutting:</strong> The subtle cutting lines guide your scissors or rotary cutter so every photo is trimmed cleanly.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revolutionary Floating Tactile Action Dock (Never Overflows!) -->
+  <div class="floating-dock-container">
+    <div class="floating-dock">
+      <button class="download-btn btn-docx" id="downloadDocxBtn">
+        <span class="btn-icon-wrapper">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </span>
+        <span>Download DOCX</span>
+      </button>
+
+      <button class="download-btn btn-pdf" id="downloadPdfBtn">
+        <span class="btn-icon-wrapper">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </span>
+        <span>Download PDF</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Complete Multi-State Modal System (Loading, Confirmation, Alert) -->
+  <div class="modal-overlay" id="appModal">
+    <div class="modal-card">
+      <!-- State 1: Loading -->
+      <div class="modal-state" id="modalStateLoading" style="display: none;">
+        <div class="spinner"></div>
+        <div class="modal-title" id="loadingTitle">Generating Document...</div>
+        <div class="modal-desc" id="loadingDesc">Aligning photos to exact physical millimeter grids.</div>
+      </div>
+
+      <!-- State 2: Success Confirmation & Critical Print Config -->
+      <div class="modal-state" id="modalStateSuccess" style="display: none;">
+        <div class="modal-icon-circle success">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div class="modal-title" style="font-size: 1.05rem;">Ready to Download</div>
+        
+        <!-- File Name Badge -->
+        <div class="file-name-pill" id="summaryFileName">PhotoPrint_A4_Passport.pdf</div>
+
+        <!-- Critical Scale Warning Banner (Focal Point!) -->
+        <div class="scale-warning-banner">
+          <div class="warning-icon">⚠️</div>
+          <div class="warning-content">
+            <div class="warning-headline">SCALE: 100% (ACTUAL SIZE)</div>
+            <div class="warning-sub">Huwag piliin ang "Fit to Page" o "Shrink". Masisira at liliit ang official size ng photo!</div>
+          </div>
+        </div>
+
+        <!-- Compact Specs Grid (3 Tiles) -->
+        <div class="quick-specs-grid">
+          <div class="spec-pill">
+            <span class="spec-label">Paper</span>
+            <span class="spec-value" id="summaryPaper">A4 (210×297)</span>
+          </div>
+          <div class="spec-pill">
+            <span class="spec-label">Layout</span>
+            <span class="spec-value" id="summaryLayout">30 photos</span>
+          </div>
+          <div class="spec-pill">
+            <span class="spec-label">Quality</span>
+            <span class="spec-value" id="summaryFormatBadge">PDF 300 DPI</span>
+          </div>
+        </div>
+
+        <!-- 2 Essential Print Tips -->
+        <div class="print-quick-tips">
+          <div class="tip-line">
+            <span>✨</span>
+            <span>Piliin ang <strong>Glossy Photo Paper</strong> at <strong>High Quality</strong>.</span>
+          </div>
+          <div class="tip-line">
+            <span>✂️</span>
+            <span>May <strong>0.5pt cut lines</strong> para pantay ang gupit.</span>
+          </div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="modal-actions" style="margin-top: 2px;">
+          <button class="modal-btn modal-btn-primary" id="modalConfirmDownloadBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span id="modalDownloadBtnText">Download File Now</span>
+          </button>
+          <button class="modal-btn modal-btn-secondary" id="modalCloseBtn">Cancel</button>
+        </div>
+      </div>
+
+      <!-- State 3: Alert / Error -->
+      <div class="modal-state" id="modalStateAlert" style="display: none;">
+        <div class="modal-icon-circle alert">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="modal-title" id="alertTitle">Photo Required</div>
+        <div class="modal-desc" id="alertDesc">Please upload or snap a photo before downloading the print grid.</div>
+        <div class="modal-actions" style="margin-top: 8px;">
+          <button class="modal-btn modal-btn-primary" id="alertActionBtn">Upload Photo</button>
+          <button class="modal-btn modal-btn-secondary" id="alertCloseBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

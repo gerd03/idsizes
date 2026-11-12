@@ -272,7 +272,8 @@ def get_root():
         return FileResponse(index_file)
     return HTMLResponse("<h2>ID Photo Studio Server Running</h2><p>Static files missing.</p>")
 
-@app.get("/api/info")
+@app.api_route("/api/info", methods=["GET"])
+@app.api_route("/info", methods=["GET"])
 def get_info():
     return {
         "status": "ready",
@@ -293,7 +294,8 @@ def get_info():
         }
     }
 
-@app.post("/api/generate")
+@app.api_route("/api/generate", methods=["POST"])
+@app.api_route("/generate", methods=["POST"])
 async def generate_sheet(
     image: UploadFile = File(...),
     paper_size: str = Form("a4"),
